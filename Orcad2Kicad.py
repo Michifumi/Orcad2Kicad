@@ -35,6 +35,7 @@ def Calay_Read(rfname, wfname = 'NET.TXT') :
     for line in open(rfname, 'r'):
         f.write(line)
         line = line.replace('\n', '')        #改行削除
+        line = line.replace('\r', '')        #改行削除
         #print(line)
         words = re.split(" +", line)         #１行をスペースで分離
         #print(words)
@@ -122,15 +123,24 @@ def Kicad_Write(netlist, wfname = 'kicad.net', rfname = '') :
     f = open(wfname, 'w')
     f.write("(export (version D)\n")
 
-    if rfname != '' :
-        import numpy as np
+
+    if rfname != '' and os.path.isfile(rfname) :
+        import csv
         #Reference, Value, Footprint, Datasheet
         #"C1","C_Small","Capacitors_SMD:C_0603_HandSoldering",""
         #"R1","R_Small","Resistors_SMD:R_0603_HandSoldering",""
         #"L1","L_Small","Inductors_SMD:L_0603_HandSoldering",""
       
-        #data = np.loadtxt(rfname, delimiter=",", skiprows=1, dtype='str' )
-        data = np.loadtxt(rfname, delimiter=",", skiprows=1, dtype=[('Reference', 'S10'), ('Value', 'S20'), ('Footprint', 'S50')] )
+        data = []
+        with open(rfname, 'r') as fcsv:
+            reader = csv.reader(fcsv)       # readerオブジェクトを作成
+            header = next(reader)           # 最初の一行をヘッダーとして取得
+            #print(header)                  # ヘッダーをスペース区切りで表示
+            if (header[0].strip() == 'Reference') and (header[1].strip() == 'Value') and (header[2].strip() == 'Footprint') :
+                # 行ごとのリストを処理する
+                for row in reader:
+                    data.append(row)   # １行ずつスペース区切りで表示
+
         #print(data)
 
         data_n = len(data); data_n -= 1
@@ -221,6 +231,8 @@ pcb_dir = os.path.dirname(pcb_file)
 #pcb_name =  os.path.basename(pcb_file)
 #print("Dir:{0:s}   Name:{1:s}\n").format(pcb_dir, pcb_name)
 
+#作業ディレクトリを記憶
+now_dir = os.getcwd() 
 #作業ディレクトリを今実行しているディレクトリへ移動
 os.chdir(pcb_dir)
 
@@ -229,5 +241,11 @@ os.chdir(pcb_dir)
 net = Calay_Read('calay.net')
 
 #KiCADネットリストを部品情報付で出力する
-Kicad_Write(net, 'kicad.net')
+#部品情報自動作成（部品パッドを自動的にピンヘッダー）する場合
+#Kicad_Write(net, 'kicad.net')
+#部品情報（パーツリスト）をcsvファイルで指定する場合
+Kicad_Write(net, 'kicad.net', 'partlist.csv')
+
+#作業ディレクトリを元に戻す
+os.chdir(now_dir)
 

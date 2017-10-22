@@ -1,0 +1,4 @@
+Reference, Value, Footprint, Datasheet
+"C002","0.1u","Capacitors_SMD:C_0603_HandSoldering",""
+"R003","1K","Resistors_SMD:R_0603_HandSoldering",""
+"L001","10u","Inductors_SMD:L_0603_HandSoldering",""
