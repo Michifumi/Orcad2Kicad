@@ -26,7 +26,7 @@
 3. Start Pcbnew, in case, select and execute Python console.
 4. In the console, execute "pwd" and copy this software "Orcad2Kicad.py" to the folder that is outputed (normally "C: \ Program Files \ KiCad").
 5. In the console, enter "execfile (" Orcad2Kicad.py ")" and execute it.
-6. A Pcbnew netlist "kicad.net" file is generated. In the created file, the component pads are automatically assigned pin headers with the maximum pin count of each component.
+6. A Pcbnew netlist file is generated. In the created file, the component pads are automatically assigned pin headers (or QFP) with the maximum pin count of each component.
 7. Import that netlist. After that, if you change the parts pad, you can design the board.
 8. Since the methods up to 7 above are changed for each part, it is troublesome if there are many parts. So, if you can prepare part number and part pad information in csv file, you can use it to create a netlist for KiCAD.
     + Create the part number and component pad information csv file name "partlist.csv" with the attached sample referring to the board design folder you are currently editing.

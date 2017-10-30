@@ -39,25 +39,29 @@ def Calay_Read(rfname, wfname = 'NET.TXT') :
         #print(line)
         words = re.split(" +", line)         #１行をスペースで分離
         #print(words)
-        if n == 0 :                         #ネット名前を記憶
+        if n == 0 :                          #ネット名前を記憶
             name = words[0].strip()
 
         if len(words) > 0 :                  #ネットが存在する時        
             w = words[-1]
             if w == '' :
                 EOF = 1
-            elif w[-1] == ';' :             #最後の文字が';'の時
+            elif w[-1] == ';' :              #最後の文字が';'の時
                 words[-1] = w[:-1]           #';'削除の上、再登録
-                for w in words[1:] :        #ネットを記憶
-                    net.append(w.strip())
+                for w in words[1:] :         #ネットを記憶
+                    w = w.strip()
+                    if len(w) > 0 :
+                        net.append(w)
                 EOF = 1
                 #print(name)
                 #print(net)
                 #print()
             elif w[-1] == ',' :             #最後の文字が','の時
-                words[-1] = w[:-1]           #','削除の上、再登録
+                words[-1] = w[:-1]          #','削除の上、再登録
                 for w in words[1:] :        #ネットを記憶
-                    net.append(w.strip())
+                    w = w.strip()
+                    if len(w) > 0 :
+                        net.append(w)
                 EOF = 0
             else :
                 EOF = 1
@@ -67,7 +71,7 @@ def Calay_Read(rfname, wfname = 'NET.TXT') :
         
         if EOF == 1 :
             if name != '' and len(net) > 0 : 
-                net.sort()                   #ネットリストの並べ替え
+                net.sort()                  #ネットリストの並べ替え
                 netname.append(name)
                 netlist.append(net)
 
@@ -135,22 +139,25 @@ def Kicad_Write(netlist, wfname = 'kicad.net', rfname = '') :
         with open(rfname, 'r') as fcsv:
             reader = csv.reader(fcsv)       # readerオブジェクトを作成
             header = next(reader)           # 最初の一行をヘッダーとして取得
-            #print(header)                  # ヘッダーをスペース区切りで表示
+            #print(header)                  # ヘッダーを表示
             if (header[0].strip() == 'Reference') and (header[1].strip() == 'Value') and (header[2].strip() == 'Footprint') :
                 # 行ごとのリストを処理する
                 for row in reader:
-                    data.append(row)   # １行ずつスペース区切りで表示
+                    data.append(row)        # １行ずつデータ追加
 
         #print(data)
 
         data_n = len(data); data_n -= 1
         for i, w in enumerate(data) :
-
+            value =  w[1].decode('utf8')
+            j = value.find('(')		    #　value値にある"("以降の文字列削除
+            if j >= 0 :
+	        value = value[0:j]
             f.write("  (components\n")
             f.write('    (comp (ref {0:s})\n'.format( w[0].decode('utf8') ))
-            f.write('      (value {0:s})\n'.format( w[1].decode('utf8') ))
+            f.write('      (value {0:s})\n'.format( value ))
             f.write('      (footprint {0:s})\n'.format( w[2].decode('utf8') ))
-            f.write('      (libsource (lib device) (part {0:s}))\n'.format( w[1].decode('utf8') ))           
+            f.write('      (libsource (lib device) (part ""))\n')           
             f.write('      (sheetpath (names /) (tstamps /))\n')            
             f.write('      (tstamp {0:X}))'.format(i + 0xA400))     
 
@@ -185,10 +192,14 @@ def Kicad_Write(netlist, wfname = 'kicad.net', rfname = '') :
             f.write('      (value "{0:s}:{1:d}")\n'.format(w.rstrip("0123456789"), pin_max))
             if pin_max <= 40 :
                 f.write('      (footprint "Pin_Headers:Pin_Header_Straight_1x{0:0>2d}_Pitch2.54mm")\n'.format(pin_max))
-            elif pin <= 80 :
-                f.write('      (footprint "Pin_Headers:Pin_Header_Straight_2x{0:0>2d}_Pitch2.54mm")\n'.format(pin_max//2))
+            elif pin_max <= 80 :
+                f.write('      (footprint "Pin_Headers:Pin_Header_Straight_2x{0:0>2d}_Pitch2.54mm")\n'.format(pin_max//2 + pin_max%2))
+            elif pin_max <= 100 :
+                f.write('      (footprint "Housings_QFP:LQFP-100_14x14mm_Pitch0.5mm")\n')
+            elif pin_max <= 208 :
+                f.write('      (footprint "Housings_QFP:LQFP-208_28x28mm_Pitch0.5mm")\n')
             else :
-                f.write('      (footprint "Pin_Headers:Pin_Header_Straight_2x40_Pitch2.54mm")\n')                
+                f.write('      (footprint "Housings_QFP:PQFP-256_28x28mm_Pitch0.4mm")\n')                
             f.write('      (libsource (lib device) (part ""))\n')           
             f.write('      (sheetpath (names /) (tstamps /))\n')            
             f.write('      (tstamp {0:X}))'.format(i + 0xA400))     
@@ -242,9 +253,9 @@ net = Calay_Read('calay.net')
 
 #KiCADネットリストを部品情報付で出力する
 #部品情報自動作成（部品パッドを自動的にピンヘッダー）する場合
-#Kicad_Write(net, 'kicad.net')
+#Kicad_Write(net, pcb_file.replace('.kicad_pcb','.net'))
 #部品情報（パーツリスト）をcsvファイルで指定する場合
-Kicad_Write(net, 'kicad.net', 'partlist.csv')
+Kicad_Write(net, pcb_file.replace('.kicad_pcb','.net'), 'partlist.csv')
 
 #作業ディレクトリを元に戻す
 os.chdir(now_dir)
