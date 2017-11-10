@@ -1,8 +1,8 @@
-#About "Orcad2Kicad" 
+# About "Orcad2Kicad" 
 
 
 
-##A. Overview 
+## A. Overview 
 
 + "Orcad2Kicad.py" is a macro program that runs on the PCB design software Pcbnew of KiCADv4, inputs the OrCAD netlist file, and outputs Pcbnew netlist.
 
@@ -16,7 +16,7 @@
 
 ## C. Confirmation environment 
 
-+ KiCAD Ver 4.07 on Windows 7-64 bit / Ubuntu14.04LTS-64 bit
++ KiCAD Ver 4.07 on Windows7-64bit / Ubuntu14.04LTS-64bit
 
 
 ## D. Usage 
@@ -25,9 +25,10 @@
 2. Copy this file to KiCAD's board design folder to be edited.
 3. Start Pcbnew, in case, select and execute Python console.
 4. In the console, execute "pwd" and copy this software "Orcad2Kicad.py" to the folder that is outputed (normally "C: \ Program Files \ KiCad").
-5. In the console, enter "execfile (" Orcad2Kicad.py ")" and execute it.
+5. In the console, enter 'execfile("Orcad2Kicad.py")' and execute it.
 6. A Pcbnew netlist file is generated. In the created file, the component pads are automatically assigned pin headers (or QFP) with the maximum pin count of each component.
 7. Import that netlist. After that, if you change the parts pad, you can design the board.
 8. Since the methods up to 7 above are changed for each part, it is troublesome if there are many parts. So, if you can prepare part number and part pad information in csv file, you can use it to create a netlist for KiCAD.
     + Create the part number and component pad information csv file name "partlist.csv" with the attached sample referring to the board design folder you are currently editing.
-    + In this state, if you execute "execfile (" Orcad2Kicad.py ")" in the console as in the above 5, the program will automatically detect "partlist.csv" and use this file A netlist is generated.
+    + In this state, if you execute 'execfile("Orcad2Kicad.py")' in the console as in the above 5, the program will automatically detect "partlist.csv" and use this file A netlist is generated.
+9. If an error occurs when importing the netlist or if there is a change in the circuit diagram, select "File" -> "export" -> "component file (.cmp)" in Pcbnew, design it now Please create a component file of the board. After that, please input 'execfile("Orcad2Kicad.py")' in the Python console of above 5 ~ 7, create an updated netlist, and then import it.
