@@ -354,16 +354,23 @@ now_dir = os.getcwd()
 #作業ディレクトリを今実行しているディレクトリへ移動
 os.chdir(pcb_dir)
 
+try:
+    #Calayネットリストを読み込む
+    net = Calay_Read('calay.net')
 
-#Calayネットリストを読み込む
-net = Calay_Read('calay.net')
+    #KiCADネットリストを部品情報付で出力する
+    #部品情報自動作成（部品パッドを自動的にピンヘッダー）する場合
+    #Kicad_Write(net, pcb_file.replace('.kicad_pcb','.net'))
+    #部品情報（パーツリスト）をcsvファイルで指定する場合
+    Kicad_Write(net, pcb_file.replace('.kicad_pcb','.net'), 'partlist.csv')
 
-#KiCADネットリストを部品情報付で出力する
-#部品情報自動作成（部品パッドを自動的にピンヘッダー）する場合
-#Kicad_Write(net, pcb_file.replace('.kicad_pcb','.net'))
-#部品情報（パーツリスト）をcsvファイルで指定する場合
-Kicad_Write(net, pcb_file.replace('.kicad_pcb','.net'), 'partlist.csv')
+    #処理完了表示
+    print("OK! Conversion complete(net:%d)\n" % len(net[0]))
+except:
+    #エラー表示
+    print("Error: Conversion failed\n")
 
-#作業ディレクトリを元に戻す
-os.chdir(now_dir)
+finally:
+    #作業ディレクトリを元に戻す
+    os.chdir(now_dir)
 
